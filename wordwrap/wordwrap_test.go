@@ -148,7 +148,23 @@ func TestWordWrap(t *testing.T) {
 		// Indent wrapped lines
 		{
 			"foo bar foo",
-			"foo\nbar\nfoo",
+			"foo\n  bar\n  foo",
+			4,
+			true,
+			2,
+		},
+		// Indent wrapped lines
+		{
+			"foo bar foo",
+			"foo\n    bar\n    foo",
+			4,
+			true,
+			4,
+		},
+		// Indent only wrapped lines
+		{
+			"foo\nbar foo",
+			"foo\nbar\n  foo",
 			4,
 			true,
 			2,
@@ -158,6 +174,7 @@ func TestWordWrap(t *testing.T) {
 	for i, tc := range tt {
 		f := NewWriter(tc.Limit)
 		f.KeepNewlines = tc.KeepNewlines
+		f.IndentWrapped = tc.IndentWrapped
 
 		_, err := f.Write([]byte(tc.Input))
 		if err != nil {

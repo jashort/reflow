@@ -17,10 +17,11 @@ var (
 // support for ANSI escape sequences. This means you can style your terminal
 // output without affecting the word wrapping algorithm.
 type WordWrap struct {
-	Limit        int
-	Breakpoints  []rune
-	Newline      []rune
-	KeepNewlines bool
+	Limit         int
+	Breakpoints   []rune
+	Newline       []rune
+	KeepNewlines  bool
+	IndentWrapped int
 
 	buf   bytes.Buffer
 	space bytes.Buffer
@@ -34,10 +35,11 @@ type WordWrap struct {
 // default settings.
 func NewWriter(limit int) *WordWrap {
 	return &WordWrap{
-		Limit:        limit,
-		Breakpoints:  defaultBreakpoints,
-		Newline:      defaultNewline,
-		KeepNewlines: true,
+		Limit:         limit,
+		Breakpoints:   defaultBreakpoints,
+		Newline:       defaultNewline,
+		KeepNewlines:  true,
+		IndentWrapped: 0,
 	}
 }
 
@@ -142,6 +144,9 @@ func (w *WordWrap) Write(b []byte) (int, error) {
 			if w.lineLen+w.space.Len()+w.word.PrintableRuneWidth() > w.Limit &&
 				w.word.PrintableRuneWidth() < w.Limit {
 				w.addNewLine()
+				for i := 1; i <= w.IndentWrapped; i++ {
+					_, _ = w.buf.WriteRune(' ')
+				}
 			}
 		}
 	}
